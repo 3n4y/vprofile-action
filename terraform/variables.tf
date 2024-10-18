@@ -12,6 +12,6 @@ variable "instance_type" {
 
 variable "public_key" {
   description = "public key content"
-  type  = string
+  type        = string
 }
 ##
