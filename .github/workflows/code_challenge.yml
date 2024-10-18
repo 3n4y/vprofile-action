@@ -2,7 +2,7 @@ name: "Setup Infrastructure"
 on:
   push:
     branches:
-      - stage
+      - staging
     paths:
       - terraform/**
       
