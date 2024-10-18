@@ -13,5 +13,6 @@ variable "instance_type" {
 variable "public_key" {
   description = "public key content"
   type        = string
+  default     = "Change me at deploy"
 }
 ##
