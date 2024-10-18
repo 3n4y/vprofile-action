@@ -21,12 +21,12 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_key_pair" "connect_key" {
   key_name   = "code_challenge"
-  public_key = file("~/.ssh/code_challenge.pub")
+  public_key = var.public_key
 }
 
 resource "aws_instance" "ubuntu" {
   ami               = data.aws_ami.ubuntu.id
-  instance_type     = var.INSTANCE_TYPE
-  availability_zone = var.ZONE1
+  instance_type     = var.instance_type
+  availability_zone = var.zone1
   key_name          = aws_key_pair.connect_key.key_name
 }

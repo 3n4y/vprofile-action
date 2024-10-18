@@ -12,6 +12,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
   AWS_REGION: us-east-1
+  PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
 
   
 jobs:
@@ -52,3 +53,9 @@ jobs:
       - name: Terraform plan status
         if: steps.plan.outcome == 'failure'
         run: exit 1
+
+      # - name: Terraform Apply
+      #   run: terraform apply -auto-approve
+      #   env:
+      #     TF_VAR_public_key: ${{ secrets.PUBLIC_KEY }}
+

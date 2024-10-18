@@ -1,13 +1,17 @@
-variable "REGION" {
+variable "region" {
   default = "us-east-1"
 }
 
-variable "ZONE1" {
+variable "zone1" {
   default = "us-east-1a"
 }
 
-variable "INSTANCE_TYPE" {
+variable "instance_type" {
   default = "t2.micro"
 }
 
+variable "public_key" {
+  description = "public key content"
+  type  = string
+}
 ##
