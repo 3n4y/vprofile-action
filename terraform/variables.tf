@@ -1,9 +1,9 @@
 variable "REGION" {
-  default = "us-east-2"
+  default = "us-east-1"
 }
 
 variable "ZONE1" {
-  default = "us-east-2a"
+  default = "us-east-1a"
 }
 
 variable "INSTANCE_TYPE" {
