@@ -13,6 +13,7 @@ env:
   BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
   AWS_REGION: us-east-1
   PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+  SECRET_KEY: ${{}}
 
   
 jobs:
@@ -56,7 +57,7 @@ jobs:
 
       - name: check secret key
         id: key
-        run: echo "${{ env.SECRET_KEY }}"
+        run: echo "${{ env.PUBLIC_KEY }}"
 
 #      - name: Terraform Apply
 #        id: apply
