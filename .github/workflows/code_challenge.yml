@@ -64,8 +64,8 @@ jobs:
       - name: Retrieve instance public IP
         id: instance_ip
         run: |
-#           echo "::set-output name=instance_ip::$(terraform output instance_public_ip)"
-#          echo "::set-output name=instance_ip::$(pwd)"
+          # echo "::set-output name=instance_ip::$(terraform output instance_public_ip)"
+          # echo "::set-output name=instance_ip::$(pwd)"
           echo "{INSTANCE_IP}={$(pwd)}" >> $GITHUB_OUTPUT
           echo "$INSTANCE_IP" > instance_ip.txt
 
