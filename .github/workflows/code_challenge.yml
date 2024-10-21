@@ -61,13 +61,13 @@ jobs:
         id: apply
         run: terraform apply -auto-approve -input=false -parallelism=1 planfile
 
-      - name: Get instance IP
-        id: instance_ip
-        run: echo "$(terraform output -raw instance_ip)" > instance_ip.txt
-
-      - name: Upload instance IP artifact
-        uses: actions/upload-artifact@v3
+      - name: Update instance IP secret
+        uses: actions/github-script@v6
         with:
-          name: instance_ip
-          path: instance_ip.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.actions.setSecret({
+              name: 'INSTANCE_PUBLIC_IP',
+              value: $(terraform output instance_ip)
+            })
 
