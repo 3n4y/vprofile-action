@@ -56,7 +56,7 @@ jobs:
 
       - name: check secret key
         id: key
-        run: echo ${{ secrets.PUBLIC_KEY }}
+        run: echo ${{ env.SECRET_KEY }}
 
 #      - name: Terraform Apply
 #        id: apply
