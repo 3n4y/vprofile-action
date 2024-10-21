@@ -1,9 +1,9 @@
 variable "region" {
-  default = "us-east-1"
+  default = "us-east-2"
 }
 
 variable "zone1" {
-  default = "us-east-1a"
+  default = "us-east-2a"
 }
 
 variable "instance_type" {
@@ -13,6 +13,5 @@ variable "instance_type" {
 variable "public_key" {
   description = "public key content"
   type        = string
-  default     = "Change me at deploy"
+  default     = ""
 }
-##
