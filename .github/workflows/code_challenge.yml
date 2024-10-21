@@ -13,9 +13,7 @@ env:
   BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
   AWS_REGION: us-east-1
   PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
-  SECRET_KEY: ${{vars.SECRET_KEY}}
 
-  
 jobs:
   terraform:
     name: "Apply terraform code changes"
@@ -33,6 +31,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.9.3"
+
+      - name: Configure Terraform variables
+        id: key vars
+        run: echo "public_key = \"$PUBLIC_KEY\"" > terraform.tfvars
 
       - name: Terraform init
         id: init
@@ -55,23 +57,17 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: check secret key
-        id: key
-        run: echo "${{ env.SECRET_KEY }}"
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
 
-#      - name: Terraform Apply
-#        id: apply
-#        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
-#        env:
-#          TF_VAR_public_key: "${{ secrets.PUBLIC_KEY }}"
-#
-#      - name: Get instance IP
-#        id: instance_ip
-#        run: echo "$(terraform output -raw instance_ip)" > instance_ip.txt
-#
-#      - name: Upload instance IP artifact
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: instance_ip
-#          path: instance_ip.txt
+      - name: Get instance IP
+        id: instance_ip
+        run: echo "$(terraform output -raw instance_ip)" > instance_ip.txt
+
+      - name: Upload instance IP artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: instance_ip
+          path: instance_ip.txt
 
