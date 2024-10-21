@@ -33,7 +33,7 @@ jobs:
           terraform_version: "1.9.3"
 
       - name: Configure Terraform variables
-        id: key vars
+        id: key_vars
         run: echo "public_key = \"$PUBLIC_KEY\"" > terraform.tfvars
 
       - name: Terraform init
