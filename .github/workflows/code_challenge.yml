@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - staging
-    paths:
-      - terraform/**
+#    paths:
+#      - terraform/**
       
 env:
   # Credentials for deployment to AWS
@@ -54,19 +54,23 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: Terraform Apply
-        id: apply
-        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
-        env:
-          TF_VAR_public_key: ${{ secrets.PUBLIC_KEY }}
+      - name: check secret key
+        id: key
+        run: echo ${{ secrets.PUBLIC_KEY }}
 
-      - name: Get instance IP
-        id: instance_ip
-        run: echo "$(terraform output -raw instance_ip)" > instance_ip.txt
-
-      - name: Upload instance IP artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: instance_ip
-          path: instance_ip.txt
+#      - name: Terraform Apply
+#        id: apply
+#        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
+#        env:
+#          TF_VAR_public_key: "${{ secrets.PUBLIC_KEY }}"
+#
+#      - name: Get instance IP
+#        id: instance_ip
+#        run: echo "$(terraform output -raw instance_ip)" > instance_ip.txt
+#
+#      - name: Upload instance IP artifact
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: instance_ip
+#          path: instance_ip.txt
 
