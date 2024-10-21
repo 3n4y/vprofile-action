@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "zone1" {
-  default = "us-east-1a"
+  default = "us-east-2a"
 }
 
 variable "instance_type" {
