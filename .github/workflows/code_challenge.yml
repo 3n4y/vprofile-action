@@ -68,11 +68,15 @@ jobs:
           # echo "::set-output name=instance_ip::$(pwd)"
           echo "{INSTANCE_IP}={$(pwd)}" >> $GITHUB_OUTPUT
           echo "$INSTANCE_IP" > instance_ip.txt
-
-      - name: Store instance IP as artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: instance_ip.txt
-          path: instance_ip.txt
+          path: ./terraform/instance_ip.txt
+
+#      - name: Store instance IP as artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: instance_ip.txt
+#          path: instance_ip.txt
         
         
