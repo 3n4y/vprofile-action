@@ -54,9 +54,19 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-#      - name: Terraform Apply
-#        id: apply
-#        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
-#        env:
-#          TF_VAR_public_key: $PUBLIC_KEY
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
+        env:
+          TF_VAR_public_key: $PUBLIC_KEY
+
+      - name: Get instance IP
+        id: instance_ip
+        run: echo "$(terraform output -raw instance_ip)" > instance_ip.txt
+
+      - name: Upload instance IP artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: instance_ip
+          path: instance_ip.txt
 
