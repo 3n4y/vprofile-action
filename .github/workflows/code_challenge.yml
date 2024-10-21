@@ -60,12 +60,12 @@ jobs:
         id: apply
         run: terraform apply -auto-approve -input=false -parallelism=1 planfile
 
-      - name: Retrieve instance public IP
+      - name: Retrieve instance public IP and store in file
         id: instance_ip
         run: |
-          echo "$(terraform output instance_public_ip)" > instance_ip.txt
+          echo "$(terraform output instance_ip)" > instance_ip.txt
 
-      - name: Store instance ip as artifact
+      - name: upload ip file as artifact
         uses: actions/upload-artifact@v4
         with:
           name: instance_ip.txt
