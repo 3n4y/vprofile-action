@@ -13,7 +13,6 @@ env:
   BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
   AWS_REGION: us-east-1
   PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
-  SECRET_KEY: ${{}}
 
   
 jobs:
