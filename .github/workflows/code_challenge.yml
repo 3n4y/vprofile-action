@@ -65,7 +65,7 @@ jobs:
         run: echo "$(terraform output -raw instance_ip)" > instance_ip.txt
 
       - name: Upload instance IP artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: instance_ip
           path: instance_ip.txt
