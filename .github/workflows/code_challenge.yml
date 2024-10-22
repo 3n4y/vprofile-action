@@ -3,9 +3,9 @@ on:
   push:
     branches:
       - staging
-    paths:
-      - terraform/**
-      - ansible/**
+#    paths:
+#      - terraform/**
+#      - ansible/**
       
 env:
   # Credentials for deployment to AWS
@@ -16,15 +16,15 @@ env:
   PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
 
 jobs:
-  # terraform:
-  #   name: "Apply terraform code changes"
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #       working-directory: ./terraform
+   terraform:
+     name: "Apply terraform code changes"
+     runs-on: ubuntu-latest
+     defaults:
+       run:
+         shell: bash
+         working-directory: ./terraform
 
-  #   steps:
+     steps:
   #     - name: Checkout source code
   #       uses: actions/checkout@v4
 
@@ -71,8 +71,40 @@ jobs:
   #       with:
   #         name: instance_ip.txt
   #         path: ./terraform/instance_ip.txt
+       - name: Create or update variable
+         uses: actions/github-script@v6
+         env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           VARIABLE_NAME: ${{ inputs.variable_name }}
+           VARIABLE_VALUE: ${{ inputs.variable_value }}
+         with:
+            script: |
+               const variable = github.actions.getRepositoryVariable({
+                 owner: context.repo.owner,
+                 repo: context.repo.repo,
+                 variable_name: VARIABLE_NAME
+               });
+               
+               if (variable) {
+                 github.actions.updateRepositoryVariable({
+                   owner: context.repo.owner,
+                   repo: context.repo.repo,
+                   variable_id: variable.id,
+                   value: VARIABLE_VALUE
+                 });
+                 console.log(`Updated variable ${VARIABLE_NAME} with value ${VARIABLE_VALUE}`);
+               } else {
+                 github.actions.createRepositoryVariable({
+                   owner: context.repo.owner,
+                   repo: context.repo.repo,
+                   variable_name: VARIABLE_NAME,
+                   value: VARIABLE_VALUE
+                 });
+                 console.log(`Created variable ${VARIABLE_NAME} with value ${VARIABLE_VALUE}`);
+               }
+   
 
-  ansible:
+   ansible:
     # needs: terraform
     runs-on: ubuntu-latest
 
