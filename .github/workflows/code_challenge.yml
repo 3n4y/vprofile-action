@@ -75,8 +75,8 @@ jobs:
          uses: actions/github-script@v6
          env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-           VARIABLE_NAME: ${{ inputs.variable_name }}
-           VARIABLE_VALUE: ${{ inputs.variable_value }}
+           VARIABLE_NAME: ec2 ip
+           VARIABLE_VALUE: Banana, pawpaw, pineapple
          with:
             script: |
                const variable = github.actions.getRepositoryVariable({
@@ -104,17 +104,17 @@ jobs:
                }
    
 
-   ansible:
-    # needs: terraform
-    runs-on: ubuntu-latest
-
-    steps:
-      # - name: Checkout code
-        # uses: actions/checkout@v4
-      
-      - name: Download instace IP artifact
-        id: get_artifact
-        run: |
-          INSTANCE_IP=$(cat instance_ip.txt)
-          echo "EC2 instance Public IP: $INSTANCE_IP"
+#   ansible:
+#    # needs: terraform
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      # - name: Checkout code
+#        # uses: actions/checkout@v4
+#
+#      - name: Download instace IP artifact
+#        id: get_artifact
+#        run: |
+#          INSTANCE_IP=$(cat instance_ip.txt)
+#          echo "EC2 instance Public IP: $INSTANCE_IP"
         
