@@ -5,6 +5,7 @@ on:
       - staging
     paths:
       - terraform/**
+      - ansible/**
       
 env:
   # Credentials for deployment to AWS
