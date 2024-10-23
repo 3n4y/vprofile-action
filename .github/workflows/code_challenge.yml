@@ -13,22 +13,8 @@ env:
   PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
 
 jobs:
-   check-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      folder-changed: ${{ steps.check.outputs.folder-changed }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Check for changes in folder
-        id: check
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^terraform/'; then echo "folder-changed=true" >> $GITHUB_OUTPUT; else echo "folder-changed=false" >> $GITHUB_OUTPUT; fi
-
    terraform:
      name: "Apply terraform code changes"
-     needs: check-changes
      runs-on: ubuntu-latest
      if: needs.check-changes.outputs.folder-changed == 'true'
      defaults:
