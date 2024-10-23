@@ -88,7 +88,7 @@ jobs:
         run: |
           echo "instance_ip set in the previous step is ${{ steps.get_and_set_instance_ip.outputs.instance_ip}}"
 
-      - name: Retrieve instance IP from artifact
+      - name: Retrieve instance IP and attach to playbook
         run: |
           INSTANCE_PUBLIC_IP=${{ steps.get_and_set_instance_ip.outputs.instance_ip }}
           echo "EC2 Instance Public IP: $INSTANCE_PUBLIC_IP"
