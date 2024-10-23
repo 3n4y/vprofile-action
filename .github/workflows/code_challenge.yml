@@ -16,7 +16,6 @@ jobs:
    terraform:
      name: "Apply terraform code changes"
      runs-on: ubuntu-latest
-     if: needs.check-changes.outputs.folder-changed == 'true'
      defaults:
        run:
          shell: bash
