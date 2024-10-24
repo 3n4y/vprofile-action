@@ -95,7 +95,7 @@
 # play 2
 # -------------
 - name: Start and verify minikube is running
-  hosts: all
+  hosts: EC2
   become: false
 
   tasks:
