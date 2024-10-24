@@ -50,10 +50,6 @@
         group: docker
         mode: '0660'
 
-    - name: Refresh group membership
-      command: newgrp docker
-      ignore_errors: yes
-
     - name: Reload Docker daemon
       ansible.builtin.service:
         name: docker
@@ -112,6 +108,8 @@
   tasks:
     - name: Start Minikube
       ansible.builtin.command: minikube start --driver=docker
+      environment:
+        CHANGE_MINIKUBE_NONE_USER: "true"
       changed_when: false
 
     - name: Verify Minikube status
