@@ -95,4 +95,4 @@ jobs:
           echo "EC2 Instance Public IP: $INSTANCE_PUBLIC_IP"
           
           # Your Ansible playbook command here
-          ansible-playbook -i $INSTANCE_PUBLIC_IP install_minikube.yml -u ubuntu
+          ansible-playbook -i install_minikube.yml -u ubuntu
