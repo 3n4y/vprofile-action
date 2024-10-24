@@ -89,9 +89,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Set SSH key permissions
-        run: |
-          chmod 600 ~/.ssh/id_rsa
+#      - name: Set SSH key permissions
+#        run: |
+#          chmod 600 ~/.ssh/id_rsa
 
       - name: Retrieve instance IP and attach to playbook
         run: |
