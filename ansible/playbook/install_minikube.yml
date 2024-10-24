@@ -50,6 +50,10 @@
         group: docker
         mode: '0660'
 
+    - name: Refresh group membership
+      command: newgrp docker
+      ignore_errors: yes
+
     - name: Reload Docker daemon
       ansible.builtin.service:
         name: docker
