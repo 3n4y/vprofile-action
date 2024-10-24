@@ -89,15 +89,17 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-#      - name: Set SSH key permissions
-#        run: |
-#          chmod 600 ~/.ssh/id_rsa
-
-      - name: Retrieve instance IP and attach to playbook
+      - name: Retrieve instance IP and store as env variable
         run: |
-          INSTANCE_PUBLIC_IP=${{ steps.get_and_set_instance_ip.outputs.instance_ip }}
+          echo "INSTANCE_PUBLIC_IP=${{ steps.get_and_set_instance_ip.outputs.instance_ip }}" >> $GITHUB_ENV
           echo "EC2 Instance Public IP: $INSTANCE_PUBLIC_IP"
-          ssh -o StrictHostKeyChecking=no ubuntu@$INSTANCE_PUBLIC_IP "echo 'SSH connection successful'"
-          
-          # Your Ansible playbook command here
-          # ansible-playbook -i $INSTANCE_PUBLIC_IP, install_minikube.yml
+
+      - name: Update host.ini file with IP
+        run: |
+          echo "ec2-instance ansible_host=$INSTANCE_PUBLIC_IP ansible_user=ubuntu" >> hosts.ini
+          cat hosts.ini
+        working-directory: ./ansible/inventory
+
+      - name: Run ansible playbook
+        run: |
+          ansible-playbook -i inventory/hosts.ini playbook/install_minikube.yml
