@@ -89,16 +89,17 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Retrieve instance IP and attach to playbook
+      - name: Retrieve instance IP and store as env variable
         run: |
-          INSTANCE_PUBLIC_IP=${{ steps.get_and_set_instance_ip.outputs.instance_ip }}
+          echo "INSTANCE_PUBLIC_IP=${{ steps.get_and_set_instance_ip.outputs.instance_ip }}" >> $GITHUB_ENV
           echo "EC2 Instance Public IP: $INSTANCE_PUBLIC_IP"
 
       - name: Update host.ini file with IP
         run: |
           echo "ec2-instance ansible_host=$INSTANCE_PUBLIC_IP ansible_user=ubuntu" >> hosts.ini
           cat hosts.ini
+        working-directory: ./ansible/inventory
 
       - name: Run ansible playbook
         run: |
-          ansible-playbook -i $INSTANCE_PUBLIC_IP, --user ubuntu install_minikube.yml
+          ansible-playbook -i inventory/hosts.ini install_minikube.yml
