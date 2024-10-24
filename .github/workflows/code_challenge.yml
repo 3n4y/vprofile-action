@@ -97,6 +97,7 @@ jobs:
       - name: Update host.ini file with IP
         run: |
           echo "ec2-instance ansible_host=$INSTANCE_PUBLIC_IP ansible_user=ubuntu" >> hosts.ini
+          cat hosts.ini
 
       - name: Run ansible playbook
         run: |
