@@ -43,6 +43,17 @@
         groups: docker
         append: true
 
+    - name: Ensure Docker socket has correct group ownership
+      file:
+        path: /var/run/docker.sock
+        owner: root
+        group: docker
+        mode: '0660'
+
+    - name: Refresh group membership without logout
+      command: newgrp docker
+      ignore_errors: yes
+
     - name: Reload Docker daemon
       ansible.builtin.service:
         name: docker
