@@ -102,4 +102,4 @@ jobs:
 
       - name: Run ansible playbook
         run: |
-          ansible-playbook -i inventory/hosts.ini install_minikube.yml
+          ansible-playbook -i inventory/hosts.ini playbook/install_minikube.yml
