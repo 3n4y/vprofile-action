@@ -20,7 +20,8 @@ jobs:
        run:
          shell: bash
          working-directory: ./terraform
-
+     outputs:
+      instance_ip: ${{ steps.get_and_set_instance_ip.outputs.instance_ip }}
      steps:
        - name: Checkout source code
          uses: actions/checkout@v4
@@ -59,6 +60,10 @@ jobs:
          id: apply
          run: terraform apply -auto-approve -input=false -parallelism=1 planfile
 
+       - name: get ec2 ip address
+         id: get_and_set_instance_ip
+         run: |
+           echo "instance_ip=$(terraform output instance_ip)" >> $GITHUB_OUTPUT
 
    ansible:
     needs: terraform
@@ -67,22 +72,9 @@ jobs:
       run:
         shell: bash
         working-directory: ./ansible
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Terraform with specified version on the runner
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.9.3" 
-
-      - name: Terraform init and get ec2 ip address
-        id: get_and_set_instance_ip
-        run: |
-          terraform init -backend-config="bucket=$BUCKET_TF_STATE"
-          echo "instance_ip=$(terraform output instance_ip)" >> $GITHUB_OUTPUT
-        working-directory: ./terraform
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -91,7 +83,7 @@ jobs:
 
       - name: Retrieve instance IP and store as env variable
         run: |
-          echo "INSTANCE_PUBLIC_IP=${{ steps.get_and_set_instance_ip.outputs.instance_ip }}" >> $GITHUB_ENV
+          echo "INSTANCE_PUBLIC_IP=${{ needs.terraform.outputs.instance_ip }}" >> $GITHUB_ENV
           echo "EC2 Instance Public IP: $INSTANCE_PUBLIC_IP"
 
       - name: Update host.ini file with IP
@@ -103,3 +95,11 @@ jobs:
       - name: Run ansible playbook
         run: |
           ansible-playbook -i inventory/hosts.ini playbook/install_minikube.yml
+
+  #  build_and_publish:
+  #    needs: ansible
+  #    runs-on: ubuntu-latest
+
+  #    steps:
+  #      - name: Checkout code
+  #        uses: actions/checkout@v4
