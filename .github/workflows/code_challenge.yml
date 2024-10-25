@@ -92,6 +92,14 @@ jobs:
           cat hosts.ini
         working-directory: ./ansible/inventory
 
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install Ansible
+        run: pip install ansible
+
       - name: Run ansible playbook
         run: |
           ansible-playbook -i inventory/hosts.ini playbook/install_minikube.yml
