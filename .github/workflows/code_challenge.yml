@@ -11,103 +11,129 @@ env:
   BUCKET_TF_STATE: ${{ secrets.BUCKET_TF_STATE }}
   AWS_REGION: us-east-1
   PUBLIC_KEY: ${{ secrets.PUBLIC_KEY }}
+  REGISTRY: ${{ secrets.REGISTRY }}
+  ECR_REPOSITORY_APP: vprofileapp
+  ECR_REPOSITORY_DB: codechallenge
 
 jobs:
-   terraform:
-     name: "Apply terraform code changes"
-     runs-on: ubuntu-latest
-     defaults:
-       run:
-         shell: bash
-         working-directory: ./terraform
-     outputs:
-      instance_ip: ${{ steps.get_and_set_instance_ip.outputs.instance_ip }}
-     steps:
-       - name: Checkout source code
-         uses: actions/checkout@v4
-
-       - name: Setup Terraform with specified version on the runner
-         uses: hashicorp/setup-terraform@v3
-         with:
-           terraform_version: "1.9.3"
-
-       - name: Configure Terraform variables
-         id: key_vars
-         run: echo "public_key = \"$PUBLIC_KEY\"" > terraform.tfvars
-
-       - name: Terraform init
-         id: init
-         run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
-
-       - name: Terraform format
-         id: fmt
-         run: terraform fmt -check
-
-       - name: Terraform validate
-         id: validate
-         run: terraform validate
-
-       - name: Terraform plan
-         id: plan
-         run: terraform plan -no-color -input=false -out planfile
-         continue-on-error: true
-
-       - name: Terraform plan status
-         if: steps.plan.outcome == 'failure'
-         run: exit 1
-
-       - name: Terraform Apply
-         id: apply
-         run: terraform apply -auto-approve -input=false -parallelism=1 planfile
-
-       - name: get ec2 ip address
-         id: get_and_set_instance_ip
-         run: |
-           echo "instance_ip=$(terraform output instance_ip)" >> $GITHUB_OUTPUT
-
-   ansible:
-    needs: terraform
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./ansible
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Retrieve instance IP and store as env variable
-        run: |
-          echo "INSTANCE_PUBLIC_IP=${{ needs.terraform.outputs.instance_ip }}" >> $GITHUB_ENV
-          echo "EC2 Instance Public IP: $INSTANCE_PUBLIC_IP"
-
-      - name: Update host.ini file with IP
-        run: |
-          echo "ec2-instance ansible_host=$INSTANCE_PUBLIC_IP ansible_user=ubuntu" >> hosts.ini
-          cat hosts.ini
-        working-directory: ./ansible/inventory
-
-      - name: setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
-      - name: Install Ansible
-        run: pip install ansible
-
-      - name: Run ansible playbook
-        run: |
-          ansible-playbook -i inventory/hosts.ini playbook/install_minikube.yml
-
-  #  build_and_publish:
-  #    needs: ansible
+  #  terraform:
+  #    name: "Apply terraform code changes"
   #    runs-on: ubuntu-latest
-
+  #    defaults:
+  #      run:
+  #        shell: bash
+  #        working-directory: ./terraform
+  #    outputs:
+  #     instance_ip: ${{ steps.get_and_set_instance_ip.outputs.instance_ip }}
   #    steps:
-  #      - name: Checkout code
+  #      - name: Checkout source code
   #        uses: actions/checkout@v4
+
+  #      - name: Setup Terraform with specified version on the runner
+  #        uses: hashicorp/setup-terraform@v3
+  #        with:
+  #          terraform_version: "1.9.3"
+
+  #      - name: Configure Terraform variables
+  #        id: key_vars
+  #        run: echo "public_key = \"$PUBLIC_KEY\"" > terraform.tfvars
+
+  #      - name: Terraform init
+  #        id: init
+  #        run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
+
+  #      - name: Terraform format
+  #        id: fmt
+  #        run: terraform fmt -check
+
+  #      - name: Terraform validate
+  #        id: validate
+  #        run: terraform validate
+
+  #      - name: Terraform plan
+  #        id: plan
+  #        run: terraform plan -no-color -input=false -out planfile
+  #        continue-on-error: true
+
+  #      - name: Terraform plan status
+  #        if: steps.plan.outcome == 'failure'
+  #        run: exit 1
+
+  #      - name: Terraform Apply
+  #        id: apply
+  #        run: terraform apply -auto-approve -input=false -parallelism=1 planfile
+
+  #      - name: get ec2 ip address
+  #        id: get_and_set_instance_ip
+  #        run: |
+  #          echo "instance_ip=$(terraform output instance_ip)" >> $GITHUB_OUTPUT
+
+  #  ansible:
+  #   needs: terraform
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #       working-directory: ./ansible
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up SSH
+  #       uses: webfactory/ssh-agent@v0.9.0
+  #       with:
+  #         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+  #     - name: Retrieve instance IP and store as env variable
+  #       run: |
+  #         echo "INSTANCE_PUBLIC_IP=${{ needs.terraform.outputs.instance_ip }}" >> $GITHUB_ENV
+  #         echo "EC2 Instance Public IP: $INSTANCE_PUBLIC_IP"
+
+  #     - name: Update host.ini file with IP
+  #       run: |
+  #         echo "ec2-instance ansible_host=$INSTANCE_PUBLIC_IP ansible_user=ubuntu" >> hosts.ini
+  #         cat hosts.ini
+  #       working-directory: ./ansible/inventory
+
+  #     - name: setup python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.13'
+
+  #     - name: Install Ansible
+  #       run: pip install ansible
+
+  #     - name: Run ansible playbook
+  #       run: |
+  #         ansible-playbook -i inventory/hosts.ini playbook/install_minikube.yml
+
+   build_and_publish:
+     runs-on: ubuntu-latest
+
+     steps:
+       - name: Checkout code
+         uses: actions/checkout@v4
+       - name: upload app image to ECR
+         uses: appleboy/docker-ecr-action@master
+         with:
+           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           registry: ${{ secrets.REGISTRY }}
+           repo: ${{ ENV.ECR_REPOSITORY_APP }}
+           region: ${{ env.AWS_REGION }}
+           tags: applatest,${{ github.run_number }}
+           daemon_off: false
+           dockerfile: ./Dockerfile
+           context: ./
+       - name: upload db image to ECR
+         uses: appleboy/docker-ecr-action@master
+         with:
+           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           registry: ${{ secrets.REGISTRY }}
+           repo: ${{ ENV.ECR_REPOSITORY_DB }}
+           region: ${{ env.AWS_REGION }}
+           tags: dblatest,${{ github.run_number }}
+           daemon_off: false
+           dockerfile: ./Dockerfile
+           context: ./db
